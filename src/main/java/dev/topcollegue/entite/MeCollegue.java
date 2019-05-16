@@ -1,12 +1,14 @@
 package dev.topcollegue.entite;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 @Entity
 public class MeCollegue {
@@ -24,6 +26,11 @@ public class MeCollegue {
 	private String photoUrl;
 	@Column
 	private String email;
+	@Column
+	private Long score;
+	
+	@OneToMany(mappedBy="participantCol")
+	private Set<Vote> vote;
 	
 	public MeCollegue() {
 		super();
@@ -89,6 +96,26 @@ public class MeCollegue {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+
+	public Set<Vote> getVote() {
+		return vote;
+	}
+
+
+	public void setVote(Set<Vote> vote) {
+		this.vote = vote;
+	}
+
+
+	public Long getScore() {
+		return score;
+	}
+
+
+	public void setScore(Long score) {
+		this.score = score;
 	}
 	
 }

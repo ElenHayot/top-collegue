@@ -36,8 +36,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.and().authorizeRequests()
 			
 			.antMatchers("/h2-console/**").permitAll()
-			.antMatchers(HttpMethod.POST, "/").permitAll()
+			.antMatchers(HttpMethod.POST, "/auth").permitAll()
 			.antMatchers(HttpMethod.GET, "/list").hasRole("USER")
+			.antMatchers(HttpMethod.POST, "/vote").hasRole("USER")
 			
 			.anyRequest().authenticated()
 			.and().headers().frameOptions().disable()

@@ -1,10 +1,19 @@
 package dev.topcollegue.service;
 
+import static org.assertj.core.api.Assertions.setAllowComparingPrivateFields;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.*;
+import static java.util.Map.Entry.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -18,9 +27,12 @@ import org.springframework.web.client.RestTemplate;
 
 import dev.topcollegue.entite.MeCollegue;
 import dev.topcollegue.entite.Participant;
+import dev.topcollegue.entite.Vote;
+import dev.topcollegue.entite.Vote.VoteValue;
 import dev.topcollegue.exception.EmptyRepositoryException;
 import dev.topcollegue.exception.EntityNotFoundException;
 import dev.topcollegue.repository.ParticipantRepository;
+import dev.topcollegue.repository.VoteRepository;
 
 @Service
 public class ParticipantService {
@@ -32,6 +44,8 @@ public class ParticipantService {
 	
 	@Autowired
 	private ParticipantRepository repo;
+	@Autowired
+	private VoteRepository voteRepo;
 	
 	
 	public ParticipantService() {
@@ -99,5 +113,67 @@ public class ParticipantService {
 		}
 		
 	}
+
+	
+	public void addVote(Vote vote) {
+		vote.setAuthorCol(repo.findByEmail(vote.getAuthorEmail()));
+		vote.setParticipantCol(repo.findByEmail(vote.getParticipantEmail()));
+		voteRepo.save(vote);
+		
+	}
+	
+	public Long calculerScore(Map<VoteValue, Long> map) {
+		
+		Long result;
+		result = map.get(VoteValue.LIKE)*10 + map.get(VoteValue.DISLIKE)*(-5);
+		return result;
+	}
+	
+	public Map<MeCollegue, Long> countVotes() {
+		
+		Map<MeCollegue, Long> classement = new HashMap<>();
+		
+		for(MeCollegue collegue:repo.findAll()){
+			Set<VoteValue> items = voteRepo.findVoteValueByParticipantCol(collegue.getEmail());
+			Map<VoteValue, Long> result = items.stream().collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+			Long score = calculerScore(result);
+			collegue.setScore(score);
+			classement.put(collegue, score);
+		}
+		
+		Map<MeCollegue, Long> sortedClassement = classement.entrySet()
+					.stream()
+					.sorted(Collections.reverseOrder(comparingByValue()))
+					.collect(
+							toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
+		
+		return sortedClassement;
+	}
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

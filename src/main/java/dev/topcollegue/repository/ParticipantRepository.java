@@ -6,7 +6,9 @@ import dev.topcollegue.entite.MeCollegue;
 
 public interface ParticipantRepository extends JpaRepository<MeCollegue, String>{
 
-	Boolean findByEmail(String participantEmail);
+	MeCollegue findByEmail(String participantEmail);
+
+	MeCollegue findByMatricule(String matricule);
 
 	//TODO
 	//set getParticipantByCollegueEmail
