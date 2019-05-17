@@ -131,17 +131,21 @@ public class ParticipantService {
 	
 	public Map<MeCollegue, Long> countVotes() {
 		
-		Map<MeCollegue, Long> classement = new HashMap<>();
 		
+		Map<MeCollegue, Long> classement = new HashMap<>();
+		Map<MeCollegue, Long> sortedClassement = new HashMap<>();
+		//from here, a ghost?
 		for(MeCollegue collegue:repo.findAll()){
-			Set<VoteValue> items = voteRepo.findVoteValueByParticipantCol(collegue.getEmail());
+			Set<VoteValue> items = voteRepo.findVoteValueByParticipantEmail(collegue.getEmail());
 			Map<VoteValue, Long> result = items.stream().collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 			Long score = calculerScore(result);
 			collegue.setScore(score);
 			classement.put(collegue, score);
 		}
+		//to here
 		
-		Map<MeCollegue, Long> sortedClassement = classement.entrySet()
+		
+		 classement.entrySet()
 					.stream()
 					.sorted(Collections.reverseOrder(comparingByValue()))
 					.collect(

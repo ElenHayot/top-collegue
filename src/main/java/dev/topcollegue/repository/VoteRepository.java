@@ -10,6 +10,8 @@ import dev.topcollegue.entite.Vote.VoteValue;
 public interface VoteRepository extends JpaRepository<Vote, Integer>{
 
 	Set<VoteValue> findVoteValueByParticipantCol(String email);
+
+	Set<VoteValue> findVoteValueByParticipantEmail(String email);
 	
 
 }
